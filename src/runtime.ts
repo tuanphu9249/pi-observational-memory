@@ -148,6 +148,11 @@ export class Runtime {
 
 	ensureConfig(cwd: string): void {
 		if (this.configLoaded) return;
+		this.reloadConfig(cwd);
+	}
+
+	/** Re-read the settings files, for example after `/om:settings` saved a change. */
+	reloadConfig(cwd: string): void {
 		this.config = loadConfig(cwd);
 		this.configLoaded = true;
 	}

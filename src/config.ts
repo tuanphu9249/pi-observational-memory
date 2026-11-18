@@ -272,7 +272,7 @@ export function resolveObserverChunkMaxTokens(config: Config, contextWindow: num
 	return OBSERVER_CHUNK_FALLBACK_MAX_TOKENS;
 }
 
-const SETTINGS_KEY = "observational-memory";
+export const SETTINGS_KEY = "observational-memory";
 const PASSIVE_ENV = "PI_OBSERVATIONAL_MEMORY_PASSIVE";
 
 function positiveIntegerOrUndefined(value: unknown): number | undefined {
@@ -323,7 +323,7 @@ function normalizeModel(value: unknown): ConfiguredModel | undefined {
 	return model;
 }
 
-function normalizeSettingsConfig(value: Record<string, unknown>): Partial<Config> {
+export function normalizeSettingsConfig(value: Record<string, unknown>): Partial<Config> {
 	const normalized: Partial<Config> = {};
 	const numberKeys = [
 		"observeAfterTokens",
@@ -382,7 +382,7 @@ function readPiCompactionEnabled(path: string): boolean | undefined {
 	}
 }
 
-function readNamespacedConfig(path: string): Partial<Config> {
+export function readNamespacedConfig(path: string): Partial<Config> {
 	if (!existsSync(path)) return {};
 	try {
 		const raw = JSON.parse(readFileSync(path, "utf-8")) as Record<string, unknown>;
@@ -393,9 +393,19 @@ function readNamespacedConfig(path: string): Partial<Config> {
 	}
 }
 
+/** Path of Pi's global settings file, which holds the global `observational-memory` settings. */
+export function globalSettingsPath(): string {
+	return join(getAgentDir(), "settings.json");
+}
+
+/** Path of the project settings file, whose `observational-memory` settings override the global ones. */
+export function projectSettingsPath(cwd: string): string {
+	return join(cwd, ".pi", "settings.json");
+}
+
 export function loadConfig(cwd: string, env: NodeJS.ProcessEnv = process.env): Config {
-	const globalPath = join(getAgentDir(), "settings.json");
-	const projectPath = join(cwd, ".pi", "settings.json");
+	const globalPath = globalSettingsPath();
+	const projectPath = projectSettingsPath(cwd);
 	const globalConfig = readNamespacedConfig(globalPath);
 	const projectConfig = readNamespacedConfig(projectPath);
 	const envConfig = readEnvConfig(env);

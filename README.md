@@ -210,6 +210,8 @@ Project settings override global settings.
 
 `PI_OBSERVATIONAL_MEMORY_PASSIVE` can override only `passive`.
 
+To change settings from inside Pi, run `/om:settings` (see [Commands](#commands-and-agent-tool)).
+
 A typical config:
 
 ```json
@@ -342,7 +344,10 @@ For details and tuning guidance, see [`docs/configuration.md`](docs/configuratio
 | `/om:status`        | Shows memory counts, plain `+N` / `-N` visible/full drift suffixes, progress clocks, visible and active observation pool pressure, passive/in-flight state, and last worker errors. |
 | `/om:view`          | Shows current visible memory and attempts to copy the rendered memory text to the clipboard.                                                   |
 | `/om:view full`     | Shows the full current memory state for the branch and attempts to copy the rendered memory text to the clipboard.                             |
+| `/om:settings`      | Opens a settings menu. Each change is validated, saved to `~/.pi/agent/settings.json` and applied to the current session at once.               |
 | `recall` agent tool | Recovers source evidence for a 12-character observation/reflection id on the current branch. It is not semantic search or a transcript browser. |
+
+`/om:settings` writes only the global settings file and changes only the `observational-memory` key in it. A row overridden by project `.pi/settings.json` or by `PI_OBSERVATIONAL_MEMORY_PASSIVE` says so, and a save to it shows a warning. Number rows accept `12000`, `12,000` or `12k`; an empty value removes the key, so the setting returns to its default (`auto` for the budgets derived from the context window). Other open Pi sessions read the change when they restart. Outside the TUI, the command prints the current settings.
 
 `/om:view` copies only the rendered memory content. The success/failure line shown in Pi is not included in the clipboard text. If clipboard support is unavailable, the command still prints the memory view and shows a warning. Before the first V3 compaction, visible memory can be empty because nothing has been folded into `om.folded` details; use `/om:view full` to inspect recorded branch memory.
 
